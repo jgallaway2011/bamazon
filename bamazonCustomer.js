@@ -3,11 +3,12 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 const Joi = require('joi');
 
+
 // create the connection information for the sql database
 var connection = mysql.createConnection({
     host: "localhost",
 
-    // Your port; if not 3306
+    // Your port; if not 330
     port: 330,
 
     // Your username
@@ -63,7 +64,7 @@ function start() {
                     totalCost = answer.quantity * results[answer.choice - 1].price;
                     console.log("\nPurchase Successful!\n" +
                         "Total Cost: $" + totalCost +
-                        " (" + answer.quantity + " x " + results[answer.choice - 1].price + ")"
+                        " (" + answer.quantity + " x $" + results[answer.choice - 1].price + ")"
                     );
 
                     connection.query(
