@@ -1,3 +1,4 @@
+// VARIABLES************************************************************************************************************
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const Joi = require('joi');
@@ -18,6 +19,10 @@ var connection = mysql.createConnection({
 });
 
 var newQuantity;
+var seconds = 5;
+var intervalId;
+
+// MAIN PROCESS************************************************************************************************************
 
 // connect to the mysql server and sql database
 connection.connect(function (err) {
@@ -26,16 +31,17 @@ connection.connect(function (err) {
     start();
 });
 
+// FUNCTIONS************************************************************************************************************
 function start() {
     connection.query("SELECT * FROM products", function (err, results) {
         if (err) throw err;
-        console.log("Available for Sale");
+        console.log("\nAvailable for Sale\n");
         for (i = 0; i < results.length; i++) {
             console.log("Item #: " + results[i].item_id +
                 " | Product: " + results[i].product_name +
                 " | Price: " + results[i].price);
         }
-
+        console.log("");
         inquirer
             .prompt([
                 {
@@ -54,7 +60,12 @@ function start() {
             .then(function (answer) {
                 if (answer.quantity < results[answer.choice - 1].stock_quantity) {
                     newQuantity = results[answer.choice - 1].stock_quantity - answer.quantity;
-                    console.log(newQuantity);
+                    totalCost = answer.quantity * results[answer.choice - 1].price;
+                    console.log("\nPurchase Successful!\n" +
+                        "Total Cost: $" + totalCost +
+                        " (" + answer.quantity + " x " + results[answer.choice - 1].price + ")"
+                    );
+
                     connection.query(
                         "UPDATE products SET ? WHERE ?",
                         [
@@ -67,12 +78,12 @@ function start() {
                         ],
                         function (error) {
                             if (error) throw err;
-                            start();
+                            timer();
                         }
                     );
                 } else {
                     console.log("Insufficient quantity!");
-                    start();
+                    timer();
                 }
             });
     });
@@ -97,3 +108,24 @@ function validateQuantity(quantity) {
     var schema = Joi.number().required().min(0)
     return Joi.validate(quantity, schema, onValidation);
 }
+
+// Function to give five seconds with message before program starts over
+function timer() {
+    clearInterval(intervalId);
+    intervalId = setInterval(decrement, 1000);
+  }
+
+  // The decrement function.
+  function decrement() {
+    seconds--;
+    if (seconds === 0) {
+      stopDecrement();
+      start();
+      seconds = 5;
+    }
+  }
+
+  // The stop function
+  function stopDecrement() {
+    clearInterval(intervalId);
+  }
