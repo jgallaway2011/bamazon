@@ -1,0 +1,24 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "bamazon Node CLI App",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgallaway2011/bamazon.git"
+  },
+  "author": "Joshua Gallaway",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jgallaway2011/bamazon/issues"
+  },
+  "homepage": "https://github.com/jgallaway2011/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.1.0",
+    "joi": "^13.6.0",
+    "mysql": "^2.16.0"
+  }
+}
