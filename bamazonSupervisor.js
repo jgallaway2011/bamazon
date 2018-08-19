@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -40,9 +41,22 @@ function start() {
             .then(function (answer) {
                 switch (answer.menuOptions) {
                     case "View Product Sales by Department":
-                        console.log("\nProduct Sales by Department\n");
-                        console.log("");
-                        timer();
+                    var sql = "SELECT departments.department_id AS ID, departments.department_name AS NAME, departments.over_head_costs AS EXPENSES, products.product_sales AS REVENUES FROM products JOIN departments ON products.department_name = departments.department_name";
+                        connection.query(sql, function (err, res) {
+                              if (err) throw err;
+                                console.log(res);
+                                console.log("\nProduct Sales by Department\n");
+                                var table = new Table({ head: ["", "ID", "NAME", "EXPENSES", "REVENUES", "PROFIT"] });
+
+                                table.push(
+                                    { 'Left Header 1': [res[0].ID, 'Value Row 1 Col 2', 'Value Row 1 Col 3', 'Value Row 1 Col 4', 'Value Row 1 Col 5'] }
+                                    , { 'Left Header 2': ['Value Row 2 Col 1', 'Value Row 2 Col 2', 'Value Row 2 Col 3', 'Value Row 2 Col 4', 'Value Row 2 Col 5'] }
+                                );
+
+                                console.log(table.toString());
+                                console.log("");
+                                timer();
+                            });
                         break;
                     case "Create New Department":
                         inquirer
