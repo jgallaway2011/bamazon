@@ -68,6 +68,7 @@ function start() {
                                 }, {
                                     name: "over_head_costs",
                                     type: "input",
+                                    validate: validatePositiveNumber,
                                     message: "Overhead costs?"
                                 }
                             ])
@@ -90,6 +91,21 @@ function start() {
                 }
             });
     });
+}
+
+function onValidation(error, val) {
+    if (error) {
+        return error.message;
+    }
+    else {
+        return true;
+    }
+
+}
+
+function validatePositiveNumber(quantity) {
+    var schema = Joi.number().required().min(0)
+    return Joi.validate(quantity, schema, onValidation);
 }
 
 // Function to give five seconds with message before program starts over

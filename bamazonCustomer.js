@@ -64,7 +64,7 @@ function start() {
                 }
             ])
             .then(function (answer) {
-                if (answer.quantity < results[answer.choice - 1].stock_quantity) {
+                if (answer.quantity <= results[answer.choice - 1].stock_quantity) {
                     newQuantity = results[answer.choice - 1].stock_quantity - answer.quantity;
                     totalCost = answer.quantity * results[answer.choice - 1].price;
                     productSales = totalCost + results[answer.choice - 1].product_sales;
@@ -98,7 +98,7 @@ function start() {
 
 function onValidation(error, val) {
     if (error) {
-        return err.message;
+        return error.message;
     }
     else {
         return true;

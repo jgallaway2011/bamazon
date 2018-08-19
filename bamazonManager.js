@@ -79,13 +79,18 @@ function start() {
                                     choices: function () {
                                         var choiceArray = [];
                                         for (var i = 0; i < results.length; i++) {
-                                            choiceArray.push("Item #: " + results[i].item_id + " | Product: " + results[i].product_name);
+                                            if (i < 10) {
+                                                choiceArray.push("Item #: 0" + results[i].item_id + " | Product: " + results[i].product_name);
+                                            } else {
+                                                choiceArray.push("Item #: " + results[i].item_id + " | Product: " + results[i].product_name);
+                                            }
                                         }
                                         return choiceArray;
                                     },
                                     message: "Buy inventory of which item?"
                                 }, {
                                     name: "quantityToBuy",
+                                    validate: validatePositiveNumber,
                                     type: "input",
                                     message: "How much to buy?"
                                 }
@@ -93,7 +98,7 @@ function start() {
                             .then(function (answer) {
                                 var chosenItem;
                                 for (var i = 0; i < results.length; i++) {
-                                    if (results[i].product_name === answer.choice.substring(21)) {
+                                    if (results[i].product_name === answer.choice.substring(22)) {
                                         chosenItem = results[i].item_id;
                                     }
                                 }
@@ -106,7 +111,7 @@ function start() {
                                             stock_quantity: newQuantity
                                         },
                                         {
-                                            product_name: answer.choice.substring(21)
+                                            product_name: answer.choice.substring(22)
                                         }
                                     ],
                                     function (error) {
@@ -131,10 +136,12 @@ function start() {
                                 }, {
                                     name: "price",
                                     type: "input",
+                                    validate: validatePositiveNumber,
                                     message: "Price of new product?"
                                 }, {
                                     name: "stock_quantity",
                                     type: "input",
+                                    validate: validatePositiveNumber,
                                     message: "Stock Quantity of new product?"
                                 }
                             ])
@@ -160,6 +167,21 @@ function start() {
                 }
             });
     });
+}
+
+function onValidation(error, val) {
+    if (error) {
+        return error.message;
+    }
+    else {
+        return true;
+    }
+
+}
+
+function validatePositiveNumber(quantity) {
+    var schema = Joi.number().required().min(0)
+    return Joi.validate(quantity, schema, onValidation);
 }
 
 // Function to give five seconds with message before program starts over
