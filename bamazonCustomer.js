@@ -41,7 +41,7 @@ function start() {
         if (error) throw error;
         console.log("\nAvailable for Sale\n");
         var table = new Table({
-            head: ["ITEM ID", "PRODUCT", "PRICE ($)"]
+            head: ["ITEM #", "PRODUCT", "PRICE ($)"]
         });
         for (i = 0; i < results.length; i++) {
             table.push([results[i].item_id, results[i].product_name, "$" + parseFloat(results[i].price,2)]); 

@@ -1,5 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
+const Joi = require('joi');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -42,23 +44,28 @@ function start() {
                 switch (answer.menuOptions) {
                     case "View Products for Sale":
                         console.log("\nProducts for Sale\n");
+                        var table = new Table({
+                            head: ["ITEM #", "PRODUCT", "PRICE ($)"]
+                        });
                         for (i = 0; i < results.length; i++) {
-                            console.log("Item #: " + results[i].item_id +
-                                " | Product: " + results[i].product_name +
-                                " | Price: " + results[i].price);
+                            table.push([results[i].item_id, results[i].product_name, "$" + parseFloat(results[i].price, 2)]);
                         }
+                        console.log(table.toString());
                         console.log("");
                         timer();
                         break;
                     case "View Low Inventory":
+
                         console.log("\nProducts with Low Inventory\n");
-                        for (i = 0; i < results.length; i++)
+                        var table = new Table({
+                            head: ["ITEM #", "PRODUCT", "STOCK QUANTITY"]
+                        });
+                        for (i = 0; i < results.length; i++) {
                             if (results[i].stock_quantity <= 5) {
-                                console.log("Item #: " + results[i].item_id +
-                                    " | Product: " + results[i].product_name +
-                                    " | Stock Quantity: " + results[i].stock_quantity
-                                );
+                                table.push([results[i].item_id, results[i].product_name, results[i].stock_quantity]);
                             }
+                        }
+                        console.log(table.toString());
                         console.log("");
                         timer();
                         break;
@@ -72,7 +79,7 @@ function start() {
                                     choices: function () {
                                         var choiceArray = [];
                                         for (var i = 0; i < results.length; i++) {
-                                            choiceArray.push(results[i].item_id + "-" + results[i].product_name);
+                                            choiceArray.push("Item #: " + results[i].item_id + " | Product: " + results[i].product_name);
                                         }
                                         return choiceArray;
                                     },
@@ -84,9 +91,14 @@ function start() {
                                 }
                             ])
                             .then(function (answer) {
-                                var index = parseInt(answer.choice.charAt(0)) -1;
-                                newQuantity = parseInt(results[index].stock_quantity) + parseInt(answer.quantityToBuy);
-                                console.log("\nUpdated Stock Quantity: " + newQuantity + " (" + results[index].stock_quantity + " + " + answer.quantityToBuy + ")\n");
+                                var chosenItem;
+                                for (var i = 0; i < results.length; i++) {
+                                    if (results[i].product_name === answer.choice.substring(21)) {
+                                        chosenItem = results[i].item_id;
+                                    }
+                                }
+                                newQuantity = parseInt(results[chosenItem - 1].stock_quantity) + parseInt(answer.quantityToBuy);
+                                console.log("\nUpdated Stock Quantity: " + newQuantity + " (" + results[chosenItem - 1].stock_quantity + " + " + answer.quantityToBuy + ")\n");
                                 connection.query(
                                     "UPDATE products SET ? WHERE ?",
                                     [
@@ -94,7 +106,7 @@ function start() {
                                             stock_quantity: newQuantity
                                         },
                                         {
-                                            product_name: answer.choice.substr(2)
+                                            product_name: answer.choice.substring(21)
                                         }
                                     ],
                                     function (error) {

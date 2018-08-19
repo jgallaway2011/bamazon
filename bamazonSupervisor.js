@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
+const Joi = require('joi');
 
 var connection = mysql.createConnection({
     host: "localhost",
