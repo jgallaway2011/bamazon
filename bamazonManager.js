@@ -20,15 +20,15 @@ var seconds = 5;
 var intervalId;
 
 // connect to the mysql server and sql database
-connection.connect(function (err) {
-    if (err) throw err;
+connection.connect(function (error) {
+    if (error) throw error;
     // run the start function after the connection is made to prompt the user
     start();
 });
 
 function start() {
-    connection.query("SELECT * FROM products", function (err, results) {
-        if (err) throw err;
+    connection.query("SELECT * FROM products", function (error, results) {
+        if (error) throw error;
         inquirer
             .prompt([
                 {
@@ -98,7 +98,7 @@ function start() {
                                         }
                                     ],
                                     function (error) {
-                                        if (error) throw err;
+                                        if (error) throw error;
                                         timer();
                                     }
                                 );

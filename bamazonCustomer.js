@@ -1,6 +1,7 @@
 // VARIABLES************************************************************************************************************
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 const Joi = require('joi');
 
 
@@ -28,22 +29,24 @@ var intervalId;
 // MAIN PROCESS************************************************************************************************************
 
 // connect to the mysql server and sql database
-connection.connect(function (err) {
-    if (err) throw err;
+connection.connect(function (error) {
+    if (error) throw error;
     // run the start function after the connection is made to prompt the user
     start();
 });
 
 // FUNCTIONS************************************************************************************************************
 function start() {
-    connection.query("SELECT * FROM products", function (err, results) {
-        if (err) throw err;
+    connection.query("SELECT * FROM products", function (error, results) {
+        if (error) throw error;
         console.log("\nAvailable for Sale\n");
+        var table = new Table({
+            head: ["ITEM ID", "PRODUCT", "PRICE ($)"]
+        });
         for (i = 0; i < results.length; i++) {
-            console.log("Item #: " + results[i].item_id +
-                " | Product: " + results[i].product_name +
-                " | Price: " + results[i].price);
+            table.push([results[i].item_id, results[i].product_name, "$" + parseFloat(results[i].price,2)]); 
         }
+        console.log(table.toString());
         console.log("");
         inquirer
             .prompt([
@@ -76,25 +79,25 @@ function start() {
                             {
                                 stock_quantity: newQuantity,
                                 product_sales: productSales
-                            },{
+                            }, {
                                 item_id: answer.choice
                             }
                         ],
                         function (error) {
-                            if (error) throw err;
+                            if (error) throw error;
                             timer();
                         }
                     );
                 } else {
-                    console.log("Insufficient quantity!");
+                    console.log("\nInsufficient quantity!");
                     timer();
                 }
             });
     });
 }
 
-function onValidation(err, val) {
-    if (err) {
+function onValidation(error, val) {
+    if (error) {
         return err.message;
     }
     else {
@@ -117,19 +120,19 @@ function validateQuantity(quantity) {
 function timer() {
     clearInterval(intervalId);
     intervalId = setInterval(decrement, 1000);
-  }
+}
 
-  // The decrement function.
-  function decrement() {
+// The decrement function.
+function decrement() {
     seconds--;
     if (seconds === 0) {
-      stopDecrement();
-      start();
-      seconds = 5;
+        stopDecrement();
+        start();
+        seconds = 5;
     }
-  }
+}
 
-  // The stop function
-  function stopDecrement() {
+// The stop function
+function stopDecrement() {
     clearInterval(intervalId);
-  }
+}
