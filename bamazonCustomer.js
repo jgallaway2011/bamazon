@@ -20,6 +20,8 @@ var connection = mysql.createConnection({
 });
 
 var newQuantity;
+var totalCost;
+var productSales;
 var seconds = 5;
 var intervalId;
 
@@ -62,6 +64,7 @@ function start() {
                 if (answer.quantity < results[answer.choice - 1].stock_quantity) {
                     newQuantity = results[answer.choice - 1].stock_quantity - answer.quantity;
                     totalCost = answer.quantity * results[answer.choice - 1].price;
+                    productSales = totalCost + results[answer.choice - 1].product_sales;
                     console.log("\nPurchase Successful!\n" +
                         "Total Cost: $" + totalCost +
                         " (" + answer.quantity + " x $" + results[answer.choice - 1].price + ")"
@@ -71,9 +74,9 @@ function start() {
                         "UPDATE products SET ? WHERE ?",
                         [
                             {
-                                stock_quantity: newQuantity
-                            },
-                            {
+                                stock_quantity: newQuantity,
+                                product_sales: productSales
+                            },{
                                 item_id: answer.choice
                             }
                         ],
